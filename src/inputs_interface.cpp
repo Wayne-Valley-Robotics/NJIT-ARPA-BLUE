@@ -1,6 +1,8 @@
 #include "inputs_interface.h"
 #include "SerialTransfer.h"
 
+#define DEADZONE 5
+
 namespace PS4
 {
 
@@ -38,10 +40,30 @@ namespace PS4
     /*    A N A L O G   */
     /********************/
 
-    int8_t LStickX() { return DATA::inputStruct.LStickX; }
-    int8_t LStickY() { return DATA::inputStruct.LStickY; }
-    int8_t RStickX() { return DATA::inputStruct.RStickX; }
-    int8_t RStickY() { return DATA::inputStruct.RStickY; }
+    int8_t LStickX()
+    {
+        int8_t value = DATA::inputStruct.LStickX;
+        if (value > DEADZONE || value < -DEADZONE)
+        {
+            return value;
+        }
+        return 0;
+    }
+
+    int8_t LStickY()
+    {
+        return DATA::filterDeadzone(DATA::inputStruct.LStickY, DEADZONE);
+    }
+
+    int8_t RStickX()
+    {
+        return DATA::filterDeadzone(DATA::inputStruct.RStickX, DEADZONE);
+    }
+
+    int8_t RStickY()
+    {
+        return DATA::filterDeadzone(DATA::inputStruct.RStickY, DEADZONE);
+    }
 
     /*******************************/
     /*   S T A T U S   F L A G S   */
@@ -88,6 +110,14 @@ namespace PS4
                 return true;
             }
             return false;
+        }
+        int filterDeadzone(int _input, int _deadZone)
+        {
+            if (_input > _deadZone || _input < -_deadZone)
+            {
+                return _input;
+            }
+            return 0;
         }
     }
 }

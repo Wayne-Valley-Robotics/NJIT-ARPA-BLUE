@@ -67,6 +67,7 @@ namespace PS4
     {
         void init();
         bool receiveData();
+        int filterDeadzone(int _input, int _deadZone);
 
         // https://github.com/pablomarquez76/PS4_Controller_Host/raw/refs/heads/main/examples/PS4ReceiveData/PS4ReceiveData.ino
 
