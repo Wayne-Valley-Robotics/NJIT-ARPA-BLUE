@@ -4,7 +4,7 @@ namespace drive_interface
 
     /*
     encoder pin A must be capable of interrupts.
-    
+
     there are six interrupt pins on the arduino mega: 2, 3, 18, 19, 20, 21
     pins 20 & 21 are not available to use for interrupts while they are in use for I2C (we aren't using them for that at the moment)
     most notably though they also have **external pull-ups that cannot be disabled**
@@ -20,16 +20,16 @@ namespace drive_interface
 
     // pin, invert, encoderPinA, encoderPinB
     // only the first two are required
-    MOTOR m1(9, 0, 2, 3, &m1EncoderISR);
+    MOTOR m1(9, 8, 0, 2, 3, &m1EncoderISR);
     void m1EncoderISR() { m1.readEncoder(); };
 
-    MOTOR m2(10, 0, 18, 19, &m2EncoderISR);
+    MOTOR m2(10, 9, 0, 18, 19, &m2EncoderISR);
     void m2EncoderISR() { m2.readEncoder(); };
 
-    MOTOR m3(11, 0, 20, 21, &m3EncoderISR);
+    MOTOR m3(11, 10, 0, 20, 21, &m3EncoderISR);
     void m3EncoderISR() { m3.readEncoder(); };
 
-    MOTOR m4(12, 0, 20, 21, &m4EncoderISR);
+    MOTOR m4(12, 11, 0, 20, 21, &m4EncoderISR);
     void m4EncoderISR() { m4.readEncoder(); };
 
     void initMotors() // abstracted to drive_interface to avoid depending on this header in main.cpp

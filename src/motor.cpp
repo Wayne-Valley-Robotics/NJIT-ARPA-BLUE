@@ -1,8 +1,9 @@
 #include "motor.h"
 
-MOTOR::MOTOR(int pin, bool invert, int encoderPinA, int encoderPinB, void (*encoderISR)())
+MOTOR::MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, void (*encoderISR)())
 {
-    this->pin = pin;
+    this->pwm = pwm;
+    this->dir = dir;
     this->encoderPinA = encoderPinA;
     this->encoderPinB = encoderPinB;
     this->encoderCount = 0;
@@ -10,45 +11,71 @@ MOTOR::MOTOR(int pin, bool invert, int encoderPinA, int encoderPinB, void (*enco
     this->encoderISR = encoderISR;
 }
 
-MOTOR::MOTOR(int pin, bool invert)
+MOTOR::MOTOR(int pwm, int dir, bool invert)
 {
-    this->pin = pin;
+    this->pwm = pwm;
+    this->dir = dir;
     this->invertMultiplier = invert ? -1 : 1;
-    pinMode(pin, OUTPUT);
+    pinMode(pwm, OUTPUT);
+    pinMode(dir, OUTPUT);
+}
+
+MOTOR::MOTOR(int pwm, int dir)
+{
+    this->pwm = pwm;
+    this->dir = dir;
+    pinMode(pwm, OUTPUT);
+    pinMode(dir, OUTPUT);
 }
 
 void MOTOR::begin()
 {
-    pinMode(pin, OUTPUT);
+    pinMode(pwm, OUTPUT);
+    pinMode(dir, OUTPUT);
     pinMode(encoderPinA, INPUT);
     pinMode(encoderPinB, INPUT);
 
-    // !! Make sure interrupt is defined in drive_config.h !!
-    // Using rising edge gives half the resolution, but half the interrupts.
     // Do not change this without modifying the readEncoder implementation.
-    attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
 }
 
-void MOTOR::setPower(int power)
+void MOTOR::setPower(int16_t power)
 {
 
     // invert direction if set
     power *= invertMultiplier;
-    analogWrite(pin, power);
+    bool direction = power > 0;
+    // waste of cpu cycles, but I'd rather it predictably rollover
+    uint8_t pwmPower = abs(power);
+    if (pwmPower > 255)
+    {
+        Serial.println("Motor power rollover. Did you mean to do that?");
+    }
+
+    analogWrite(pwm, pwmPower);
+    digitalWrite(dir, direction);
 }
 
-void MOTOR::setMotorInvert(bool invert)
-{
-    invertMultiplier = invert ? -1 : 1;
-}
-
-long MOTOR::readEncoderCount()
+long MOTOR::getEncoderCount()
 {
     return encoderCount;
 }
 void MOTOR::readEncoder()
 {
-    delay(1000);
+    // bool a = digitalRead(encoderPinA);
+    // bool b = digitalRead(encoderPinB);
+    // // a1 b0 == forward
+    // // a0 b1 == backward
+    // if (a && !b)
+    // {
+    //     encoderCount++;
+    //     encoderDirection = true;
+    // }
+    // else if (!a && b)
+    // {
+    //     encoderCount--;
+    //     encoderDirection = false;
+    // }
 }
 
 void MOTOR::resetEncoder()
