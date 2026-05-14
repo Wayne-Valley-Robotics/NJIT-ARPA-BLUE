@@ -3,9 +3,50 @@
 
 namespace PS4
 {
+    // Button getters
+    bool getCross() { return DATA::inputStruct.Cross; }
+    bool getCircle() { return DATA::inputStruct.Circle; }
+    bool getSquare() { return DATA::inputStruct.Square; }
+    bool getTriangle() { return DATA::inputStruct.Triangle; }
+    bool getUp() { return DATA::inputStruct.Up; }
+    bool getDown() { return DATA::inputStruct.Down; }
+    bool getLeft() { return DATA::inputStruct.Left; }
+    bool getRight() { return DATA::inputStruct.Right; }
+    bool getPSButton() { return DATA::inputStruct.PSButton; }
+    bool getTouchpad() { return DATA::inputStruct.Touchpad; }
+    bool getShare() { return DATA::inputStruct.Share; }
+    bool getOptions() { return DATA::inputStruct.Options; }
+    bool getL1() { return DATA::inputStruct.L1; }
+    bool getL2() { return DATA::inputStruct.L2; }
+    bool getR1() { return DATA::inputStruct.R1; }
+    bool getR2() { return DATA::inputStruct.R2; }
+    bool getR3() { return DATA::inputStruct.R3; }
+    bool getL3() { return DATA::inputStruct.L3; }
+
+    // Analog stick getters
+    int8_t getLStickX() { return DATA::inputStruct.LStickX; }
+    int8_t getLStickY() { return DATA::inputStruct.LStickY; }
+    int8_t getRStickX() { return DATA::inputStruct.RStickX; }
+    int8_t getRStickY() { return DATA::inputStruct.RStickY; }
+
+    // Battery and status getters
+    uint8_t getBattery() { return DATA::inputStruct.battery; }
+    bool getCharging() { return DATA::inputStruct.charging; }
+    bool getAudio() { return DATA::inputStruct.audio; }
+    bool getMic() { return DATA::inputStruct.mic; }
+
+    // Sensor getters
+    int16_t getGyroX() { return DATA::inputStruct.gyro_x; }
+    int16_t getGyroY() { return DATA::inputStruct.gyro_y; }
+    int16_t getGyroZ() { return DATA::inputStruct.gyro_z; }
+    int16_t getAccelX() { return DATA::inputStruct.accel_x; }
+    int16_t getAccelY() { return DATA::inputStruct.accel_y; }
+    int16_t getAccelZ() { return DATA::inputStruct.accel_z; }
+
+    // Poll function
     bool poll()
     {
-        // recieve new data, and process if available
+        // receive new data, and process if available
         return DATA::receiveData();
         // process/abstract new data
     }
@@ -30,28 +71,4 @@ namespace PS4
             return false;
         }
     }
-    bool *PSButton = &DATA::inputStruct.PSButton;
-    bool *Share = &DATA::inputStruct.Share;
-    bool *Options = &DATA::inputStruct.Options;
-    bool *L1 = &DATA::inputStruct.L1;
-    bool *L2 = &DATA::inputStruct.L2;
-    bool *L3 = &DATA::inputStruct.L3;
-    bool *R1 = &DATA::inputStruct.R1;
-    bool *R2 = &DATA::inputStruct.R2;
-    bool *R3 = &DATA::inputStruct.R3;
-    bool *Touchpad = &DATA::inputStruct.Touchpad;
-    bool *Up = &DATA::inputStruct.Up;
-    bool *Down = &DATA::inputStruct.Down;
-    bool *Left = &DATA::inputStruct.Left;
-    bool *Right = &DATA::inputStruct.Right;
-    bool *Cross = &DATA::inputStruct.Cross;
-    bool *Circle = &DATA::inputStruct.Circle;
-    bool *Square = &DATA::inputStruct.Square;
-    bool *Triangle = &DATA::inputStruct.Triangle;
-    uint16_t *LStickX = &DATA::inputStruct.LStickX;
-    uint16_t *LStickY = &DATA::inputStruct.LStickY;
-    uint16_t *RStickX = &DATA::inputStruct.RStickX;
-    uint16_t *RStickY = &DATA::inputStruct.RStickY;
-    uint16_t *L2Value = &DATA::inputStruct.L2Value;
-    uint16_t *R2Value = &DATA::inputStruct.R2Value;
 }
