@@ -26,6 +26,7 @@ MOTOR::MOTOR(int pwm, int dir)
     this->dir = dir;
     pinMode(pwm, OUTPUT);
     pinMode(dir, OUTPUT);
+    invertMultiplier = 1;
 }
 
 void MOTOR::begin()
