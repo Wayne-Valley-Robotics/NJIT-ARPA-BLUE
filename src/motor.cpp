@@ -78,16 +78,6 @@ void MOTOR::readEncoder() // called every time pin A changes
         encoderCount--;
         // encoderDirection = false;
     }
-
-    if (numReadTimes >= 5) // change if needed
-    {
-        cacheEncoderValue();
-        numReadTimes = 0;
-    }
-    else
-    {
-        numReadTimes++;
-    }
 }
 
 void MOTOR::resetEncoder()
@@ -95,23 +85,26 @@ void MOTOR::resetEncoder()
     encoderCount = 0;
 }
 
-long MOTOR::getEncoderSpeed()
+long MOTOR::getEncoderVelocity()
 {
-    // subtract arduino's millis timer from timestamp to determine time
-    static unsigned long timestamp;
-    unsigned long currentTime = millis();
-    unsigned long delta = currentTime - timestamp; // change in time
-    timestamp = currentTime;
+    // Velocity is a vector holding magnitude and direction.
 
-    long encoderSpeed;
-    long currentEncoderCount = getEncoderCount();
-    long encoderDisplacement = currentEncoderCount - cachedEncoderCount;
+    // Calculate Delta (change in time) since last function call.
+    static unsigned long timeStamp;
+    unsigned long currentTime = millis(); // cache millis() function call to save cpu cycles
+    unsigned long delta = currentTime - timeStamp; // change in time since last function call
 
-    encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
+    // Calculate encoder displacement since last function call.
+    static unsigned long lastEncoderCount;
+    unsigned long currentEncoderCount = getEncoderCount();
+    unsigned long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
+
+    // Calculate the speed of the motor
+    long encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
+    
+    //
+    timeStamp = currentTime;
+    lastEncoderCount = currentEncoderCount;
+    
     return encoderSpeed;
-}
-
-void MOTOR::cacheEncoderValue()
-{
-    cachedEncoderCount = getEncoderCount();
 }
