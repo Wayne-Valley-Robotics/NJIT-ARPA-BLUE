@@ -60,6 +60,7 @@ long MOTOR::getEncoderCount()
 {
     return encoderCount;
 }
+
 void MOTOR::readEncoder() // called every time pin A changes
 {
     static int numReadTimes;
@@ -85,10 +86,8 @@ void MOTOR::resetEncoder()
     encoderCount = 0;
 }
 
-long MOTOR::getEncoderVelocity()
+void MOTOR::calculateEncoderSpeed()
 {
-    // Velocity is a vector holding magnitude and direction.
-
     // Calculate Delta (change in time) since last function call.
     static unsigned long timeStamp;
     unsigned long currentTime = millis(); // cache millis() function call to save cpu cycles
@@ -100,11 +99,14 @@ long MOTOR::getEncoderVelocity()
     unsigned long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
 
     // Calculate the speed of the motor
-    long encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
+    encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
     
-    //
+    // reset for next caching
     timeStamp = currentTime;
     lastEncoderCount = currentEncoderCount;
-    
+}
+
+long MOTOR::getEncoderSpeed()
+{
     return encoderSpeed;
 }
