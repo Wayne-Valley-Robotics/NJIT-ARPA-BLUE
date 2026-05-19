@@ -39,14 +39,13 @@ void MOTOR::begin()
     attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
 }
 
-void MOTOR::setPower(int16_t power)
+void MOTOR::setPower(int targetPower)
 {
-
     // invert direction if set
-    power *= invertMultiplier;
-    bool direction = power > 0;
+    targetPower *= invertMultiplier;
+    bool direction = targetPower > 0;
     // waste of cpu cycles, but I'd rather it predictably rollover
-    uint8_t pwmPower = abs(power);
+    uint8_t pwmPower = abs(targetPower);
     if (pwmPower > 255)
     {
         Serial.println("Motor power rollover. Did you mean to do that?");
@@ -56,6 +55,19 @@ void MOTOR::setPower(int16_t power)
     digitalWrite(dir, direction);
 }
 
+void MOTOR::setSpeed(int targetSpeed) {
+    // say speed, motor go it!
+    // repeatedly call this 
+    static int lastPower;
+    int currentPower = lastPower;
+    if (getEncoderCount() < targetSpeed) { // if motor speed not enough, increase power to it by a little bit
+        currentPower++; // or however much you want to increase it by
+    } else if (getEncoderCount() > targetSpeed) {
+        currentPower--; // or however much you want to decrease it by
+    }
+    lastPower = currentPower;
+}
+
 long MOTOR::getEncoderCount()
 {
     return encoderCount;
@@ -63,7 +75,6 @@ long MOTOR::getEncoderCount()
 
 void MOTOR::readEncoder() // called every time pin A changes
 {
-    static int numReadTimes;
     // cache encoder pin values
     // bool a = digitalRead(encoderPinA);
     bool b = digitalRead(encoderPinB);
