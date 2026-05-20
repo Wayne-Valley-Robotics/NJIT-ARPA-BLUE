@@ -5,21 +5,27 @@
 
 void setup()
 {
-  // prizm.PrizmBegin();
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   PS4::DATA::init();
 
   // TODO: implement some kind of battery check to make sure the battery is charged. there are no safe-guards for this
   // and in the worst case scenario everything could look fine, until you try to drive all the motors at once and the
   // whole system browns out. maybe it's also a good idea to implement some kind of connectivity check with the controller?
-  // the inputs shouldn't update (PS4::poll() == false) if the controller isn't connected. then stop motors or smth idk
+  // the inputs shouldn't update (calling PS4::poll() will return false) if the controller isn't connected. then stop motors or smth idk
+  // ^^ THIS IS NOT TRUE. it will return false if the data transmission failed. this can be used to only run input processing when inputs are available,
+  // but it will NOT tell you if the controller is connected. thats a feature that needs to be implemented in the esp32 project. i dont have time...
 
   drive_interface::initMotors();
 
   if (!PS4::poll())
   {
     Serial.println("Waiting for controller...");
-    // wait for first input
+    // wait for first input from esp32.
+    // this only tells you if the controller
+    // is connected because the esp32 will
+    // not transmit data unless it is.
+    // this is a stupid idea.
     while (!PS4::poll())
     {
       delay(200);
@@ -31,6 +37,8 @@ void setup()
 void loop()
 {
   PS4::poll();
-  if (PS4::Square())
-    drive_interface::forward(255);
+  using namespace drive_interface;
+  drive_interface::triDrive(PS4::LStickY(), PS4::LStickX(), PS4::RStickX());
+
+  digitalWrite(LED_BUILTIN, PS4::PSButton());
 }
