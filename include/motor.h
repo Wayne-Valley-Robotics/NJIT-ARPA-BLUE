@@ -32,6 +32,7 @@ public:
 
     // DO NOT CALL under normal use. Internal ISR function to be attached to interrupt service routine if you wish to use encoders.
     void readEncoder();
+    // set encoderCount to 0. Use this to "center" a motor in a trusted position, like after hitting a limit switch.
     void resetEncoder();
     // return encoder ticks per second
     long getEncoderSpeed();

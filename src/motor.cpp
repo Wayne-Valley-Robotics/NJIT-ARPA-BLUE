@@ -78,21 +78,21 @@ void MOTOR::resetEncoder()
 
 void MOTOR::calculateEncoderSpeed()
 {
-    // Calculate Delta (change in time) since last function call.
-    static unsigned long timeStamp;
+    // Calculate delta (change in time) since last function call.
+    static unsigned long lastTime;
     unsigned long currentTime = millis(); // cache millis() function call to save cpu cycles
-    unsigned long delta = currentTime - timeStamp; // change in time since last function call
+    unsigned long delta = currentTime - lastTime; // change in time since last function call
 
     // Calculate encoder displacement since last function call.
     static unsigned long lastEncoderCount;
     unsigned long currentEncoderCount = getEncoderCount();
     unsigned long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
 
-    // Calculate the speed of the motor
+    // Calculate the speed of the motor (S = d/t)
     encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
 
-    // reset for next caching
-    timeStamp = currentTime;
+    // Cache values for next time
+    lastTime = currentTime;
     lastEncoderCount = currentEncoderCount;
 }
 
