@@ -39,7 +39,7 @@ void MOTOR::begin()
     attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
 }
 
-void MOTOR::setPower(int16_t power)
+void MOTOR::setPower(int power)
 {
 
     // invert direction if set
@@ -63,22 +63,12 @@ long MOTOR::getEncoderCount()
 
 void MOTOR::readEncoder() // called every time pin A changes
 {
-    static int numReadTimes;
     // cache encoder pin values
     // bool a = digitalRead(encoderPinA);
     bool b = digitalRead(encoderPinB);
     // a1 b0 == forward
     // a0 b1 == backward
-    if (b)
-    {
-        encoderCount++;
-        // encoderDirection = true; // waste of cpu cycles
-    }
-    else
-    {
-        encoderCount--;
-        // encoderDirection = false;
-    }
+    encoderCount += b ? 1 : -1;
 }
 
 void MOTOR::resetEncoder()
@@ -100,7 +90,7 @@ void MOTOR::calculateEncoderSpeed()
 
     // Calculate the speed of the motor
     encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
-    
+
     // reset for next caching
     timeStamp = currentTime;
     lastEncoderCount = currentEncoderCount;
