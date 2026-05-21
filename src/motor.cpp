@@ -36,10 +36,11 @@ void MOTOR::begin()
     pinMode(encoderPinA, INPUT);
     pinMode(encoderPinB, INPUT);
 
-    // Do not change this without modifying the readEncoder implementation.
+    // Do not change this without understanding the readEncoder implementation.
     attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
 }
 
+// takes 0-255
 void MOTOR::setPower(int power)
 {
 
@@ -48,7 +49,7 @@ void MOTOR::setPower(int power)
     bool direction = power > 0;
     // waste of cpu cycles, but I'd rather it predictably rollover
     uint8_t pwmPower = abs(power);
-    if (pwmPower > 255)
+    if (abs(power) > 255)
     {
         Serial.println("Motor power rollover. Did you mean to do that?");
     }
@@ -59,7 +60,7 @@ void MOTOR::setPower(int power)
 
 long MOTOR::getEncoderCount()
 {
-    return encoderCount;
+    return encoderCount * invertMultiplier; // invert encoder reading!!
 }
 
 void MOTOR::readEncoder() // called every time pin A changes
