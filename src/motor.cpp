@@ -41,7 +41,7 @@ void MOTOR::begin()
 }
 
 // takes 0-255
-void MOTOR::setPower(int16_t power)
+void MOTOR::setPower(int power)
 {
 
     // invert direction if set
@@ -62,6 +62,7 @@ long MOTOR::getEncoderCount()
 {
     return encoderCount * invertMultiplier; // invert encoder reading!!
 }
+
 void MOTOR::readEncoder() // called every time pin A changes
 {
     // cache encoder pin values
@@ -69,19 +70,35 @@ void MOTOR::readEncoder() // called every time pin A changes
     bool b = digitalRead(encoderPinB);
     // a1 b0 == forward
     // a0 b1 == backward
-    if (b)
-    {
-        encoderCount++;
-        // encoderDirection = true; // waste of cpu cycles
-    }
-    else
-    {
-        encoderCount--;
-        // encoderDirection = false;
-    }
+    encoderCount += b ? 1 : -1;
 }
 
 void MOTOR::resetEncoder()
 {
     encoderCount = 0;
+}
+
+void MOTOR::calculateEncoderSpeed()
+{
+    // Calculate delta (change in time) since last function call.
+    static unsigned long lastTime;
+    unsigned long currentTime = millis(); // cache millis() function call to save cpu cycles
+    unsigned long delta = currentTime - lastTime; // change in time since last function call
+
+    // Calculate encoder displacement since last function call.
+    static unsigned long lastEncoderCount;
+    unsigned long currentEncoderCount = getEncoderCount();
+    unsigned long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
+
+    // Calculate the speed of the motor (S = d/t)
+    encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
+
+    // Cache values for next time
+    lastTime = currentTime;
+    lastEncoderCount = currentEncoderCount;
+}
+
+long MOTOR::getEncoderSpeed()
+{
+    return encoderSpeed;
 }
