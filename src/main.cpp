@@ -39,6 +39,7 @@ void loop()
   PS4::poll();
   using namespace drive_interface;
   procDrive(PS4::LStickY()*2, PS4::LStickX()*2, PS4::RStickX()*2);
+  clawMechanism(PS4::Circle(), PS4::Triangle(), PS4::Up(), PS4::Down());
 
   digitalWrite(LED_BUILTIN, PS4::PSButton());
 }
