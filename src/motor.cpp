@@ -66,11 +66,14 @@ long MOTOR::getEncoderCount()
 void MOTOR::readEncoder() // called every time pin A changes
 {
     // cache encoder pin values
-    // bool a = digitalRead(encoderPinA);
+    bool a = digitalRead(encoderPinA);
     bool b = digitalRead(encoderPinB);
-    // a1 b0 == forward
-    // a0 b1 == backward
-    encoderCount += b ? 1 : -1;
+    // a==b == forward
+    // a!=b == backward
+    if (a == b) // forward
+        encoderCount += 1;
+    else // backward
+        encoderCount -= 1;
 }
 
 void MOTOR::resetEncoder()
@@ -82,7 +85,7 @@ void MOTOR::calculateEncoderSpeed()
 {
     // Calculate delta (change in time) since last function call.
     static unsigned long lastTime;
-    unsigned long currentTime = millis(); // cache millis() function call to save cpu cycles
+    unsigned long currentTime = millis();         // cache millis() function call to save cpu cycles
     unsigned long delta = currentTime - lastTime; // change in time since last function call
 
     // Calculate encoder displacement since last function call.
