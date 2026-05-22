@@ -24,10 +24,10 @@ namespace PS4
     bool Options();
 
     bool L1();
-    uint8_t L2();
+    int8_t L2();
 
     bool R1();
-    uint8_t R2();
+    int8_t R2();
 
     bool R3();
     bool L3();

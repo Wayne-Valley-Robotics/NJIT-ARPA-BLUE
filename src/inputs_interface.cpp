@@ -28,10 +28,10 @@ namespace PS4
     bool Options() { return DATA::inputStruct.Options; }
 
     bool L1() { return DATA::inputStruct.L1; }
-    bool L2() { return DATA::inputStruct.L2; }
+    int8_t L2() { return DATA::inputStruct.L2; }
 
     bool R1() { return DATA::inputStruct.R1; }
-    bool R2() { return DATA::inputStruct.R2; }
+    int8_t R2() { return DATA::inputStruct.R2; }
 
     bool R3() { return DATA::inputStruct.R3; }
     bool L3() { return DATA::inputStruct.L3; }
@@ -42,12 +42,7 @@ namespace PS4
 
     int8_t LStickX()
     {
-        int8_t value = DATA::inputStruct.LStickX;
-        if (value > DEADZONE || value < -DEADZONE)
-        {
-            return value;
-        }
-        return 0;
+        return DATA::filterDeadzone(DATA::inputStruct.LStickX, DEADZONE);
     }
 
     int8_t LStickY()
