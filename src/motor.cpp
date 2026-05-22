@@ -9,6 +9,7 @@ MOTOR::MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, vo
     this->encoderCount = 0;
     this->invertMultiplier = invert ? -1 : 1;
     this->encoderISR = encoderISR;
+    this->encoderSpeed = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir, bool invert)
@@ -16,28 +17,32 @@ MOTOR::MOTOR(int pwm, int dir, bool invert)
     this->pwm = pwm;
     this->dir = dir;
     this->invertMultiplier = invert ? -1 : 1;
-    pinMode(pwm, OUTPUT);
-    pinMode(dir, OUTPUT);
+    this->encoderISR = nullptr;
+    this->encoderCount = 0;
+    this->encoderSpeed = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir)
 {
     this->pwm = pwm;
     this->dir = dir;
-    pinMode(pwm, OUTPUT);
-    pinMode(dir, OUTPUT);
     invertMultiplier = 1;
+    this->encoderISR = nullptr;
+    this->encoderCount = 0;
+    this->encoderSpeed = 0;
 }
 
 void MOTOR::begin()
 {
     pinMode(pwm, OUTPUT);
     pinMode(dir, OUTPUT);
-    pinMode(encoderPinA, INPUT);
-    pinMode(encoderPinB, INPUT);
-
-    // Do not change this without understanding the readEncoder implementation.
-    attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
+    if (encoderISR != nullptr)
+    {
+        pinMode(encoderPinA, INPUT);
+        pinMode(encoderPinB, INPUT);
+        // Do not change this without understanding the readEncoder implementation.
+        attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
+    }
 }
 
 // takes 0-255
