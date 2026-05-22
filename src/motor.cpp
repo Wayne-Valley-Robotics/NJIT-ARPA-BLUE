@@ -40,7 +40,7 @@ void MOTOR::begin()
     attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
 }
 
-// takes 0-255
+// takes -255 to 255
 void MOTOR::setPower(int power)
 {
 
@@ -72,7 +72,7 @@ void MOTOR::readEncoder() // called every time pin A changes
     // a!=b == backward
     if (a == b) // forward
         encoderCount += 1;
-    else s// backward
+    else // backward
         encoderCount -= 1;
 }
 

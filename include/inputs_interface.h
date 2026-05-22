@@ -23,14 +23,15 @@ namespace PS4
     bool Share();
     bool Options();
 
-    bool L1();
-    bool L2();
+    bool L1(); // bumper
+    bool L2(); // trigger
 
-    bool R1();
-    bool R2();
+    //change no bool
+    bool R1(); // bumper
+    bool R2(); // trigger
 
-    bool R3();
-    bool L3();
+    bool R3(); // right joystick button
+    bool L3(); // left joystick button
 
     /********************/
     /*    A N A L O G   */
@@ -94,7 +95,7 @@ namespace PS4
 
         https://github.com/pablomarquez76/PS4_Controller_Host/
 
-    */
+        */
 
         // data structure to receive
         struct __attribute__((packed)) INPUT_STRUCT
