@@ -17,7 +17,7 @@ namespace drive_interface
     void m2EncoderISR();
     void m3EncoderISR();
 
-    // pin, invert, encoderPinA, encoderPinB
+    // pwm, dir, invert, encoderPinA, encoderPinB
     // only the first two are required
     MOTOR m1(5, 26, true, 2, 33, &m1EncoderISR);
     void m1EncoderISR() { m1.readEncoder(); };
