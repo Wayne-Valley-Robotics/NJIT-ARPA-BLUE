@@ -2,6 +2,7 @@
 // #include "battery.h"
 #include "inputs_interface.h"
 #include "drive_interface.h"
+#include "effector_interface.h"
 
 void setup()
 {
@@ -38,7 +39,17 @@ void loop()
 {
   PS4::poll();
   using namespace drive_interface;
-  triDrive(PS4::LStickY(), PS4::LStickX(), PS4::RStickX());
+  triDrive(PS4::LStickY() * 2, PS4::LStickX() * 2, PS4::RStickX() * 2);
+
+  // ima js slap the gantry controls here ts od work
+  int effector_speed = 150;
+
+  effector_interface::moveUp(PS4::Up() * effector_speed);
+  effector_interface::moveDown(PS4::Down() * effector_speed);
+  effector_interface::moveLeft(PS4::Left() * effector_speed);
+  effector_interface::moveRight(PS4::Right() * effector_speed);
+
+  effector_interface::proc();
 
   digitalWrite(LED_BUILTIN, PS4::PSButton());
 }
