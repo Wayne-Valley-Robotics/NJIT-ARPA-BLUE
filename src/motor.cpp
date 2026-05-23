@@ -10,6 +10,8 @@ MOTOR::MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, vo
     this->invertMultiplier = invert ? -1 : 1;
     this->encoderISR = encoderISR;
     this->encoderSpeed = 0;
+    this->lastEncoderCount = 0;
+    this->lastTime = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir, bool invert)
@@ -20,6 +22,8 @@ MOTOR::MOTOR(int pwm, int dir, bool invert)
     this->encoderISR = nullptr;
     this->encoderCount = 0;
     this->encoderSpeed = 0;
+    this->lastEncoderCount = 0;
+    this->lastTime = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir)
@@ -30,6 +34,8 @@ MOTOR::MOTOR(int pwm, int dir)
     this->encoderISR = nullptr;
     this->encoderCount = 0;
     this->encoderSpeed = 0;
+    this->lastEncoderCount = 0;
+    this->lastTime = 0;
 }
 
 void MOTOR::begin()
@@ -38,8 +44,8 @@ void MOTOR::begin()
     pinMode(dir, OUTPUT);
     if (encoderISR != nullptr)
     {
-        pinMode(encoderPinA, INPUT);
-        pinMode(encoderPinB, INPUT);
+        pinMode(encoderPinA, INPUT_PULLUP);
+        pinMode(encoderPinB, INPUT_PULLUP);
         // Do not change this without understanding the readEncoder implementation.
         attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
     }
@@ -48,7 +54,6 @@ void MOTOR::begin()
 // takes 0-255
 void MOTOR::setPower(int power)
 {
-
     // invert direction if set
     power *= invertMultiplier;
     bool direction = power > 0;
@@ -65,7 +70,11 @@ void MOTOR::setPower(int power)
 
 long MOTOR::getEncoderCount()
 {
-    return encoderCount * invertMultiplier; // invert encoder reading!!
+    noInterrupts(); // atomic guards
+    long count = encoderCount;
+    interrupts();
+
+    return count * invertMultiplier;
 }
 
 void MOTOR::readEncoder() // called every time pin A changes
@@ -76,9 +85,13 @@ void MOTOR::readEncoder() // called every time pin A changes
     // a==b == forward
     // a!=b == backward
     if (a == b) // forward
+    {
         encoderCount += 1;
+    }
     else // backward
+    {
         encoderCount -= 1;
+    }
 }
 
 void MOTOR::resetEncoder()
@@ -89,17 +102,18 @@ void MOTOR::resetEncoder()
 void MOTOR::calculateEncoderSpeed()
 {
     // Calculate delta (change in time) since last function call.
-    static unsigned long lastTime;
     unsigned long currentTime = millis();         // cache millis() function call to save cpu cycles
     unsigned long delta = currentTime - lastTime; // change in time since last function call
+    if (delta < minEncCalcDelta)                  // Only calculate if at least MIN_ENC_CALC_DELTA ms have passed for better resolution
+        return;
 
     // Calculate encoder displacement since last function call.
-    static unsigned long lastEncoderCount;
-    unsigned long currentEncoderCount = getEncoderCount();
-    unsigned long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
+    long currentEncoderCount = getEncoderCount();
+    long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
+    int reg = encoderDisplacement > 0 ? 1 : -1;
 
-    // Calculate the speed of the motor (S = d/t)
-    encoderSpeed = (encoderDisplacement * 1000L) / delta; // ticks per second
+    // Calculate the speed of the motor (S = d/t) in pulses per second
+    encoderSpeed = (abs(encoderDisplacement) * 1000L) / delta * reg;
 
     // Cache values for next time
     lastTime = currentTime;

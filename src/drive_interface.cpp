@@ -13,29 +13,20 @@ namespace drive_interface
     */
 
     // workaround for interrupts not being able to call local functions
-    // void m1EncoderISR();
-    // void m2EncoderISR();
-    // void m3EncoderISR();
-    // void m4EncoderISR();
+    void m1EncoderISR();
+    void m2EncoderISR();
+    void m3EncoderISR();
 
     // pin, invert, encoderPinA, encoderPinB
     // only the first two are required
-    // MOTOR m1(9, 8, 0, 2, 3, &m1EncoderISR);
-    // void m1EncoderISR() { m1.readEncoder(); };
+    MOTOR m1(5, 26, true, 2, 33, &m1EncoderISR);
+    void m1EncoderISR() { m1.readEncoder(); };
 
-    // MOTOR m2(10, 9, 0, 18, 19, &m2EncoderISR);
-    // void m2EncoderISR() { m2.readEncoder(); };
+    MOTOR m2(8, 31, false, 21, 32, &m2EncoderISR);
+    void m2EncoderISR() { m2.readEncoder(); };
 
-    // MOTOR m3(11, 10, 0, 20, 21, &m3EncoderISR);
-    // void m3EncoderISR() { m3.readEncoder(); };
-
-    // MOTOR m4(12, 11, 0, 20, 21, &m4EncoderISR);
-    // void m4EncoderISR() { m4.readEncoder(); };
-
-    // Which motors are which?
-    MOTOR m1(5, 26, true);
-    MOTOR m2(8, 31); // inverted
-    MOTOR m3(6, 29);
+    MOTOR m3(6, 29, false, 3, 34, &m3EncoderISR);
+    void m3EncoderISR() { m3.readEncoder(); };
 
     void initMotors() // abstracted to drive_interface to avoid depending on this header in main.cpp
     {
@@ -57,8 +48,13 @@ namespace drive_interface
         int m2Val = (-joyLX * -1 * .5) - (joyLY * sqrt(3) / 2) + joyRX;
         int m3Val = -joyLX + joyRX;
 
+        // change this to setSpeed once implemented
         m1.setPower(m3Val);
         m2.setPower(m2Val);
         m3.setPower(m1Val);
+
+        m1.calculateEncoderSpeed();
+        m2.calculateEncoderSpeed();
+        m3.calculateEncoderSpeed();
     }
 }

@@ -12,11 +12,17 @@ private:
     void (*encoderISR)();
     volatile long encoderCount;
     long encoderSpeed;
+    long lastEncoderCount;
+    unsigned long lastTime;
 
 public:
+    // minimum delay in between processing of calculateEncoderSpeed()
+    constexpr static long minEncCalcDelta = 200; // this is a safe number for testing, feel free to adjust but if you do please test it thoroughly (eyeball it ig idk lol print it to serial)
+
     MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, void (*encoderISR)());
     MOTOR(int pwm, int dir, bool invert);
     MOTOR(int pwm, int dir);
+    // This function is separate so that you can create MOTOR objects before setup() and set pinModes later so as to not interfere with boot processes.
     void begin();
     // set motor power from -255 to 255. Make sure you map your inputs!
     void setPower(int power);
@@ -36,6 +42,6 @@ public:
     void resetEncoder();
     // return encoder ticks per second
     long getEncoderSpeed();
-    // DO NOT CALL under normal use. TODO: find a way to call this regularly
+    // Call this at the very least minCalcDelta ms apart (as often as possible)
     void calculateEncoderSpeed();
 };
