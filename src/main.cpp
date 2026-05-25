@@ -17,7 +17,8 @@ void setup()
   // ^^ THIS IS NOT TRUE. it will return false if the data transmission failed. this can be used to only run input processing when inputs are available,
   // but it will NOT tell you if the controller is connected. thats a feature that needs to be implemented in the esp32 project. i dont have time...
 
-  drive_interface::initMotors();
+  drive_interface::init();
+  effector_interface::init();
 
   if (!PS4::poll())
   {
