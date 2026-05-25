@@ -27,9 +27,13 @@ void setup()
     // is connected because the esp32 will
     // not transmit data unless it is.
     // this is a stupid idea.
+    bool state = false;
     while (!PS4::poll())
     {
-      delay(200);
+      // ts lowk cool it will logically only start blinking after 800ms
+      delay(400);
+      digitalWrite(LED_BUILTIN, state);
+      state = !state;
     }
   }
   Serial.println("Controller Connected!");
