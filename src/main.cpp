@@ -44,7 +44,7 @@ void loop()
 {
   PS4::poll();
   using namespace drive_interface;
-  triDrive(PS4::LStickY() * 2, PS4::LStickX() * 2, PS4::RStickX() * 2);
+  triDrive(PS4::LStickY(), PS4::LStickX(), PS4::RStickX());
 
   // ima js slap the gantry controls here ts od work
   const int effector_speed_x = 150;
