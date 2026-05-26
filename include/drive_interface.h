@@ -4,6 +4,6 @@
 namespace drive_interface
 {
 
-    void initMotors();
+    void init();
     void triDrive(int joyLY, int joyLX, int joyRX);
 }

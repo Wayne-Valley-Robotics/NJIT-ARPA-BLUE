@@ -2,6 +2,7 @@
 // #include "battery.h"
 #include "inputs_interface.h"
 #include "drive_interface.h"
+#include "effector_interface.h"
 
 void setup()
 {
@@ -16,7 +17,8 @@ void setup()
   // ^^ THIS IS NOT TRUE. it will return false if the data transmission failed. this can be used to only run input processing when inputs are available,
   // but it will NOT tell you if the controller is connected. thats a feature that needs to be implemented in the esp32 project. i dont have time...
 
-  drive_interface::initMotors();
+  drive_interface::init();
+  effector_interface::init();
 
   // if (!PS4::poll())
   // {
@@ -26,9 +28,13 @@ void setup()
   //   // is connected because the esp32 will
   //   // not transmit data unless it is.
   //   // this is a stupid idea.
+  //   bool state = false;
   //   while (!PS4::poll())
   //   {
-  //     delay(200);
+  //     // ts lowk cool it will logically only start blinking after 800ms
+  //     delay(400);
+  //     digitalWrite(LED_BUILTIN, state);
+  //     state = !state;
   //   }
   // }
   Serial.println("Controller Connected!");
@@ -38,7 +44,22 @@ void loop()
 {
   PS4::poll();
   using namespace drive_interface;
-  triDrive(PS4::LStickY(), PS4::LStickX(), PS4::RStickX());
+  triDrive(PS4::LStickY() * 2, PS4::LStickX() * 2, PS4::RStickX() * 2);
+
+  // ima js slap the gantry controls here ts od work
+  const int effector_speed_x = 150;
+  const int effector_speed_y = 255;
+
+  effector_interface::moveUp(PS4::Up() * effector_speed_x);
+  effector_interface::moveDown(PS4::Down() * effector_speed_x);
+  effector_interface::moveLeft(PS4::Left() * effector_speed_y);
+  effector_interface::moveRight(PS4::Right() * effector_speed_y);
+
+  // // effector_interface::moveUp(effector_speed);
+  // effector_interface::moveDown(effector_speed);
+  // // effector_interface::moveLeft(effector_speed);
+  // effector_interface::moveRight(effector_speed);
+  effector_interface::proc();
 
   digitalWrite(LED_BUILTIN, PS4::PSButton());
 }

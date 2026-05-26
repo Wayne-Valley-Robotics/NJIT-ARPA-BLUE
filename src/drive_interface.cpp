@@ -28,7 +28,7 @@ namespace drive_interface
     MOTOR m3(6, 29, false, 3, 34, &m3EncoderISR);
     void m3EncoderISR() { m3.readEncoder(); };
 
-    void initMotors() // abstracted to drive_interface to avoid depending on this header in main.cpp
+    void init() // abstracted to drive_interface to avoid depending on this header in main.cpp
     {
         m1.begin();
         m2.begin();
