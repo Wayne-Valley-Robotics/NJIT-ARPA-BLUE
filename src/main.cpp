@@ -20,23 +20,23 @@ void setup()
   drive_interface::init();
   effector_interface::init();
 
-  if (!PS4::poll())
-  {
-    Serial.println("Waiting for controller...");
-    // wait for first input from esp32.
-    // this only tells you if the controller
-    // is connected because the esp32 will
-    // not transmit data unless it is.
-    // this is a stupid idea.
-    bool state = false;
-    while (!PS4::poll())
-    {
-      // ts lowk cool it will logically only start blinking after 800ms
-      delay(400);
-      digitalWrite(LED_BUILTIN, state);
-      state = !state;
-    }
-  }
+  // if (!PS4::poll())
+  // {
+  //   Serial.println("Waiting for controller...");
+  //   // wait for first input from esp32.
+  //   // this only tells you if the controller
+  //   // is connected because the esp32 will
+  //   // not transmit data unless it is.
+  //   // this is a stupid idea.
+  //   bool state = false;
+  //   while (!PS4::poll())
+  //   {
+  //     // ts lowk cool it will logically only start blinking after 800ms
+  //     delay(400);
+  //     digitalWrite(LED_BUILTIN, state);
+  //     state = !state;
+  //   }
+  // }
   Serial.println("Controller Connected!");
 }
 
@@ -47,13 +47,18 @@ void loop()
   triDrive(PS4::LStickY() * 2, PS4::LStickX() * 2, PS4::RStickX() * 2);
 
   // ima js slap the gantry controls here ts od work
-  int effector_speed = 150;
+  const int effector_speed_x = 150;
+  const int effector_speed_y = 255;
 
-  effector_interface::moveUp(PS4::Up() * effector_speed);
-  effector_interface::moveDown(PS4::Down() * effector_speed);
-  effector_interface::moveLeft(PS4::Left() * effector_speed);
-  effector_interface::moveRight(PS4::Right() * effector_speed);
+  effector_interface::moveUp(PS4::Up() * effector_speed_x);
+  effector_interface::moveDown(PS4::Down() * effector_speed_x);
+  effector_interface::moveLeft(PS4::Left() * effector_speed_y);
+  effector_interface::moveRight(PS4::Right() * effector_speed_y);
 
+  // // effector_interface::moveUp(effector_speed);
+  // effector_interface::moveDown(effector_speed);
+  // // effector_interface::moveLeft(effector_speed);
+  // effector_interface::moveRight(effector_speed);
   effector_interface::proc();
 
   digitalWrite(LED_BUILTIN, PS4::PSButton());

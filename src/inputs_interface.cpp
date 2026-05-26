@@ -94,8 +94,8 @@ namespace PS4
 
         void init()
         {
-            Serial1.begin(115200);
-            serialTransfer.begin(Serial1);
+            Serial2.begin(115200);
+            serialTransfer.begin(Serial2);
         }
         bool receiveData()
         {
