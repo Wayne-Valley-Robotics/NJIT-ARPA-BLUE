@@ -51,15 +51,15 @@ void MOTOR::begin()
     }
 }
 
-// takes 0-255
-void MOTOR::setPower(int power)
+void MOTOR::setPower(int _targetPower)
 {
+    // targetSpeed = 0; // we want to set the power, ensure target speed is nothing.
     // invert direction if set
-    power *= invertMultiplier;
-    bool direction = power > 0;
+    _targetPower *= invertMultiplier;
+    bool direction = _targetPower > 0;
     // waste of cpu cycles, but I'd rather it predictably rollover
-    uint8_t pwmPower = abs(power);
-    if (abs(power) > 255)
+    uint8_t pwmPower = map(abs(_targetPower), -MAX_SPEED, MAX_SPEED, 0, 255);
+    if (abs(_targetPower) > 255)
     {
         Serial.println("Motor power rollover. Did you mean to do that?");
     }
@@ -68,13 +68,50 @@ void MOTOR::setPower(int power)
     digitalWrite(dir, direction);
 }
 
+void MOTOR::setSpeed(int _targetSpeed)
+{
+    // say speed, motor go it!
+    // repeatedly call this
+    _targetSpeed *= invertMultiplier;
+
+    // estimate initial speed
+    if (_targetSpeed != targetSpeed)
+        currentPower = MAX_ENC_SPEED / (MAX_SPEED * targetSpeed);
+
+    // set target speed and coast if 0
+    targetSpeed = _targetSpeed;
+    if (targetSpeed == 0)
+    {
+        setPower(0);
+        return;
+    }
+}
+
+// called from calculateEncoderSpeed
+void MOTOR::adjustSpeed()
+{
+    if (abs(getEncoderSpeed()) < abs(targetSpeed))
+    { // if motor speed not enough, increase power to it by a little bit
+        currentPower = min(currentPower + SPEED_ADJUSTMENT_INCREMENT, MAX_SPEED);
+        setPower(currentPower);
+        return;
+    }
+
+    if (abs(getEncoderSpeed()) > abs(targetSpeed))
+    {
+        currentPower = max(currentPower - SPEED_ADJUSTMENT_INCREMENT, -MAX_SPEED);
+        setPower(currentPower);
+        return;
+    }
+}
+
 long MOTOR::getEncoderCount()
 {
     noInterrupts(); // atomic guards
-    long count = encoderCount;
+    long count = encoderCount * invertMultiplier;
     interrupts();
 
-    return count * invertMultiplier;
+    return count;
 }
 
 void MOTOR::readEncoder() // called every time pin A changes
@@ -109,11 +146,13 @@ void MOTOR::calculateEncoderSpeed()
 
     // Calculate encoder displacement since last function call.
     long currentEncoderCount = getEncoderCount();
-    long encoderDisplacement = currentEncoderCount - lastEncoderCount; // change in encoder count since last function call
-    int reg = encoderDisplacement > 0 ? 1 : -1;
+    long encoderDisplacement = abs(currentEncoderCount - lastEncoderCount); // change in encoder count since last function call
 
     // Calculate the speed of the motor (S = d/t) in pulses per second
-    encoderSpeed = (abs(encoderDisplacement) * 1000L) / delta * reg;
+    encoderSpeed = (encoderDisplacement * 1000L) / delta;
+
+    if (abs(targetSpeed) > 0)
+        adjustSpeed();
 
     // Cache values for next time
     lastTime = currentTime;

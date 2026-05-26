@@ -48,10 +48,14 @@ namespace drive_interface
         int m2Val = (-joyLX * -1 * .5) - (joyLY * sqrt(3) / 2) + joyRX;
         int m3Val = -joyLX + joyRX;
 
-        // change this to setSpeed once implemented
-        m1.setPower(m3Val);
-        m2.setPower(m2Val);
-        m3.setPower(m1Val);
+        m1Val = map(m1Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m2Val = map(m2Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m3Val = map(m3Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+
+
+        m1.setSpeed(m3Val);
+        m2.setSpeed(m2Val);
+        m3.setSpeed(m1Val);
 
         m1.calculateEncoderSpeed();
         m2.calculateEncoderSpeed();

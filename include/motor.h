@@ -3,10 +3,19 @@
 
 class MOTOR
 {
+public: // settings
+
+    const static int MAX_SPEED = 255;
+    // 60:1 - 1,140cpr@100rpm | 40:1 - 960cpr@150rpm | 20:1 - 480cpr@300rpm
+    const static int MAX_ENC_SPEED = 1440;
+    const static  int SPEED_ADJUSTMENT_INCREMENT = 2;
+    // minimum delay in between processing of encoder speed calculation and adjustment
+    const static long minEncCalcDelta = 20;
+
 private:
     uint8_t pwm;
     uint8_t dir;
-    int invertMultiplier;
+    int8_t invertMultiplier;
     uint8_t encoderPinA; // this must be connected to an interrupt pin
     uint8_t encoderPinB; // connect to any digital pin
     void (*encoderISR)();
@@ -14,18 +23,19 @@ private:
     long encoderSpeed;
     long lastEncoderCount;
     unsigned long lastTime;
+    int targetSpeed;
+    int currentPower;
+    void adjustSpeed();
 
 public:
-    // minimum delay in between processing of calculateEncoderSpeed()
-    constexpr static long minEncCalcDelta = 200; // this is a safe number for testing, feel free to adjust but if you do please test it thoroughly (eyeball it ig idk lol print it to serial)
-
     MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, void (*encoderISR)());
     MOTOR(int pwm, int dir, bool invert);
     MOTOR(int pwm, int dir);
-    // This function is separate so that you can create MOTOR objects before setup() and set pinModes later so as to not interfere with boot processes.
     void begin();
     // set motor power from -255 to 255. Make sure you map your inputs!
-    void setPower(int power);
+    void setPower(int targetPower);
+    // set motor speed in encoder pulses per second. Make sure you map your inputs!
+    void setSpeed(int targetSpeed);
     // manually set pwm pin from 0 to 255 and dir pin as a boolean
     void setPins(uint8_t pwm, bool dir);
     // set-and-forget motor inversion, will apply to every function EXCEPT setPins

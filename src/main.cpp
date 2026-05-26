@@ -18,19 +18,19 @@ void setup()
 
   drive_interface::initMotors();
 
-  if (!PS4::poll())
-  {
-    Serial.println("Waiting for controller...");
-    // wait for first input from esp32.
-    // this only tells you if the controller
-    // is connected because the esp32 will
-    // not transmit data unless it is.
-    // this is a stupid idea.
-    while (!PS4::poll())
-    {
-      delay(200);
-    }
-  }
+  // if (!PS4::poll())
+  // {
+  //   Serial.println("Waiting for controller...");
+  //   // wait for first input from esp32.
+  //   // this only tells you if the controller
+  //   // is connected because the esp32 will
+  //   // not transmit data unless it is.
+  //   // this is a stupid idea.
+  //   while (!PS4::poll())
+  //   {
+  //     delay(200);
+  //   }
+  // }
   Serial.println("Controller Connected!");
 }
 
