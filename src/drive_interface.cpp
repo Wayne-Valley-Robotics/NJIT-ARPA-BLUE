@@ -47,11 +47,9 @@ namespace drive_interface
         int m1Val = (-joyLX * -1 * .5) + (joyLY * sqrt(3) / 2) + joyRX; // (sqrt(3))/2 = .866
         int m2Val = (-joyLX * -1 * .5) - (joyLY * sqrt(3) / 2) + joyRX;
         int m3Val = -joyLX + joyRX;
-
-        m1Val = map(m1Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        m2Val = map(m2Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        m3Val = map(m3Val, -127, 128, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-
+        m1Val = map(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m2Val = map(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m3Val = map(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
 
         m1.setSpeed(m3Val);
         m2.setSpeed(m2Val);

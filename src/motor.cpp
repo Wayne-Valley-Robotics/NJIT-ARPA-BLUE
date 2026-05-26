@@ -58,7 +58,7 @@ void MOTOR::setPower(int _targetPower)
     _targetPower *= invertMultiplier;
     bool direction = _targetPower > 0;
     // waste of cpu cycles, but I'd rather it predictably rollover
-    uint8_t pwmPower = map(abs(_targetPower), -MAX_SPEED, MAX_SPEED, 0, 255);
+    uint8_t pwmPower = map(abs(_targetPower), 0, MAX_SPEED, 0, 255);
     if (abs(_targetPower) > 255)
     {
         Serial.println("Motor power rollover. Did you mean to do that?");
@@ -72,35 +72,52 @@ void MOTOR::setSpeed(int _targetSpeed)
 {
     // say speed, motor go it!
     // repeatedly call this
+
+    // coast if 0
+    // if (_targetSpeed == 0)
+    // {
+    //     setPower(0);
+    //     return;
+    // }
+
+    // apply inversion
     _targetSpeed *= invertMultiplier;
 
     // estimate initial speed
-    if (_targetSpeed != targetSpeed)
-        currentPower = MAX_ENC_SPEED / (MAX_SPEED * targetSpeed);
+    // if (_targetSpeed != targetSpeed)
+    //     currentPower = MAX_ENC_SPEED / MAX_SPEED * targetSpeed;
 
-    // set target speed and coast if 0
+    // set target speed
     targetSpeed = _targetSpeed;
-    if (targetSpeed == 0)
-    {
-        setPower(0);
-        return;
-    }
 }
 
 // called from calculateEncoderSpeed
 void MOTOR::adjustSpeed()
 {
-    if (abs(getEncoderSpeed()) < abs(targetSpeed))
+
+    // Serial.print("Encoder Speed: ");
+    // Serial.print(getEncoderSpeed());
+    // Serial.print("\tEncoder Count: ");
+    // Serial.print(getEncoderCount());
+    // Serial.print("\tCurrent Power: ");
+    // Serial.print(currentPower);
+    // Serial.print("\tTarget Speed: ");
+    // Serial.print(targetSpeed);
+    // Serial.println();
+
+    int regMultiplier = targetSpeed > 0 ? 1 : -1;
+
+    if (getEncoderSpeed() < targetSpeed)
     { // if motor speed not enough, increase power to it by a little bit
         currentPower = min(currentPower + SPEED_ADJUSTMENT_INCREMENT, MAX_SPEED);
-        setPower(currentPower);
+        setPower(currentPower * regMultiplier);
         return;
     }
 
-    if (abs(getEncoderSpeed()) > abs(targetSpeed))
+    if (getEncoderSpeed() > targetSpeed)
     {
         currentPower = max(currentPower - SPEED_ADJUSTMENT_INCREMENT, -MAX_SPEED);
-        setPower(currentPower);
+        setPower(currentPower * regMultiplier);
         return;
     }
 }
@@ -151,7 +168,7 @@ void MOTOR::calculateEncoderSpeed()
     // Calculate the speed of the motor (S = d/t) in pulses per second
     encoderSpeed = (encoderDisplacement * 1000L) / delta;
 
-    if (abs(targetSpeed) > 0)
+    if (targetSpeed != 0)
         adjustSpeed();
 
     // Cache values for next time

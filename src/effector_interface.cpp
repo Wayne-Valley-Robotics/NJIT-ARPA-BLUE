@@ -35,15 +35,36 @@ namespace effector_interface
         // P has no real meaning tbh
         // lowk it means whatever the logic below uses it as
         // for now it means power but it could literally just mean target speed as well
+
+        // halt at upper limit
+        if (vertP > 0 && digitalRead(VERT_LIMIT_SWITCH_PIN_TOP))
+        {
+            vertP = 0;
+        }
+        // halt at lower limit
+        if (vertP < 0 && digitalRead(VERT_LIMIT_SWITCH_PIN_BOTTOM))
+        {
+            vertP = 0;
+        }
+
+        // halt at horizontal limit
+        if (horizP > 0 && digitalRead(HORIZ_LIMIT_SWITCH_PIN_R))
+        {
+            horizP = 0;
+        }
+
+        // there is no horiz left limit switch
+
+        // set power if new inputs are available
         if (_vertP != vertP)
         {
-            _vertP = vertP;
             mV.setPower(vertP);
+            _vertP = vertP;
         }
         if (_horizP != horizP)
         {
-            _horizP = horizP;
             mH.setPower(horizP);
+            _horizP = horizP;
         }
 
         // reset variables so they dont continue in that direction forever.
@@ -56,25 +77,21 @@ namespace effector_interface
 
     void moveUp(int speed)
     {
-        if (!digitalRead(VERT_LIMIT_SWITCH_PIN_TOP))
-            vertP += speed;
+        vertP += speed;
     }
 
     void moveDown(int speed)
     {
-        if (!digitalRead(VERT_LIMIT_SWITCH_PIN_BOTTOM))
-            vertP -= speed;
+        vertP -= speed;
     }
 
     void moveLeft(int speed)
     {
-        // if (digitalRead(HORIZ_LIMIT_SWITCH_PIN_L))
-            horizP -= speed;
+        horizP -= speed;
     }
 
     void moveRight(int speed)
     {
-        if (!digitalRead(HORIZ_LIMIT_SWITCH_PIN_R))
-            horizP += speed;
+        horizP += speed;
     }
 }
