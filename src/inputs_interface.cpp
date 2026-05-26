@@ -6,7 +6,7 @@
 namespace PS4
 {
 
-    // abstracted for ease of accessw
+    // abstracted for ease of access
 
     /*********************/
     /*   B U T T O N S   */
