@@ -95,29 +95,27 @@ void MOTOR::setSpeed(int _targetSpeed)
 void MOTOR::adjustSpeed()
 {
 
-    // Serial.print("Encoder Speed: ");
-    // Serial.print(getEncoderSpeed());
-    // Serial.print("\tEncoder Count: ");
-    // Serial.print(getEncoderCount());
-    // Serial.print("\tCurrent Power: ");
-    // Serial.print(currentPower);
-    // Serial.print("\tTarget Speed: ");
-    // Serial.print(targetSpeed);
-    // Serial.println();
-
-    int regMultiplier = targetSpeed > 0 ? 1 : -1;
+    Serial.print("Encoder Speed: ");
+    Serial.print(getEncoderSpeed());
+    Serial.print("\tEncoder Count: ");
+    Serial.print(getEncoderCount());
+    Serial.print("\tCurrent Power: ");
+    Serial.print(currentPower);
+    Serial.print("\tTarget Speed: ");
+    Serial.print(targetSpeed);
+    Serial.println();
 
     if (getEncoderSpeed() < targetSpeed)
     { // if motor speed not enough, increase power to it by a little bit
         currentPower = min(currentPower + SPEED_ADJUSTMENT_INCREMENT, MAX_SPEED);
-        setPower(currentPower * regMultiplier);
+        setPower(currentPower);
         return;
     }
 
     if (getEncoderSpeed() > targetSpeed)
     {
         currentPower = max(currentPower - SPEED_ADJUSTMENT_INCREMENT, -MAX_SPEED);
-        setPower(currentPower * regMultiplier);
+        setPower(currentPower);
         return;
     }
 }
@@ -170,7 +168,11 @@ void MOTOR::calculateEncoderSpeed()
 
     if (targetSpeed != 0)
         adjustSpeed();
-
+    else
+    {
+        setPower(0);
+        currentPower = 0;
+    }
     // Cache values for next time
     lastTime = currentTime;
     lastEncoderCount = currentEncoderCount;
