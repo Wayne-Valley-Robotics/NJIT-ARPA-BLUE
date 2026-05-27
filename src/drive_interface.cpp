@@ -25,7 +25,7 @@ namespace drive_interface
     MOTOR m2(8, 31, true, 21, 32, &m2EncoderISR);
     void m2EncoderISR() { m2.readEncoder(); };
 
-    MOTOR m3(6, 29, false, 3, 34, &m3EncoderISR);
+    MOTOR m3(6, 29, true, 3, 34, &m3EncoderISR);
     void m3EncoderISR() { m3.readEncoder(); };
 
     void init() // abstracted to drive_interface to avoid depending on this header in main.cpp
@@ -47,16 +47,26 @@ namespace drive_interface
         int m1Val = (-joyLX * -1 * .5) + (joyLY * sqrt(3) / 2) + joyRX; // (sqrt(3))/2 = .866
         int m2Val = (-joyLX * -1 * .5) - (joyLY * sqrt(3) / 2) + joyRX;
         int m3Val = -joyLX + joyRX;
-        m1Val = map(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        m2Val = map(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        m3Val = map(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
 
-        m1.setSpeed(m3Val);
-        m2.setSpeed(m2Val);
-        m3.setSpeed(m1Val);
+        // Constrain values to MAX_SPEED before mapping to ensure targetSpeed is reachable
+        m1Val = constrain(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED);
+        m2Val = constrain(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED);
+        m3Val = constrain(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED);
 
-        m1.calculateEncoderSpeed();
-        m2.calculateEncoderSpeed();
-        m3.calculateEncoderSpeed();
+        // m1Val = map(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        // m2Val = map(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        // m3Val = map(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+
+        // m1.setSpeed(m3Val);
+        // m2.setSpeed(m2Val);
+        // m3.setSpeed(m1Val);
+        m1.setPower(m3Val);
+        m2.setPower(m2Val);
+        m3.setPower(m1Val);
+        // m1.setPower(100);
+
+        // m1.calculateEncoderSpeed();
+        // m2.calculateEncoderSpeed();
+        // m3.calculateEncoderSpeed();
     }
 }

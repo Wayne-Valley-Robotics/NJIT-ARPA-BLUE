@@ -45,7 +45,26 @@ void loop()
   // recieve ps4 inputs
   PS4::poll();
   using namespace drive_interface;
-  triDrive(PS4::LStickY() * 2, PS4::LStickX() * 2, PS4::RStickX() * 2);
+  const static float multiplier = 0.25;
+  int LStickY = 0;
+  int LStickX = 0;
+  int RStickX = 0;
+
+  LStickY = PS4::LStickY() * 2;
+  LStickX = PS4::LStickX() * 2;
+  RStickX = PS4::RStickX() * 2;
+
+  if (PS4::Triangle())
+    LStickY += MOTOR::MAX_SPEED * multiplier;
+  if (PS4::Cross())
+    LStickY -= MOTOR::MAX_SPEED * multiplier;
+
+  if (PS4::Square())
+    LStickX -= MOTOR::MAX_SPEED * multiplier;
+  if (PS4::Circle())
+    LStickX += MOTOR::MAX_SPEED * multiplier;
+
+  triDrive(LStickY, LStickX, RStickX);
 
   // ima js slap the gantry controls here ts od work
   const int effector_speed_x = 150;

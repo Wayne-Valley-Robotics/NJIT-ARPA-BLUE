@@ -6,10 +6,10 @@ class MOTOR
 public: // settings
     const static int MAX_SPEED = 255;
     // 60:1 - 1,140cpr@100rpm | 40:1 - 960cpr@150rpm | 20:1 - 480cpr@300rpm
-    const static int MAX_ENC_SPEED = 960;
-    const static int SPEED_ADJUSTMENT_INCREMENT = 40;
+    const static int MAX_ENC_SPEED = 1140;
+    const static int SPEED_ADJUSTMENT_INCREMENT = 13;
     // minimum delay in between processing of encoder speed calculation and adjustment
-    const static long minEncCalcDelta = 20;
+    const static long minEncCalcDelta = 12;
 
 private:
     uint8_t pwm;

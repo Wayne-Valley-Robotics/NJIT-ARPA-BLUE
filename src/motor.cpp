@@ -12,6 +12,8 @@ MOTOR::MOTOR(int pwm, int dir, bool invert, int encoderPinA, int encoderPinB, vo
     this->encoderSpeed = 0;
     this->lastEncoderCount = 0;
     this->lastTime = 0;
+    this->targetSpeed = 0;
+    this->currentPower = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir, bool invert)
@@ -24,6 +26,8 @@ MOTOR::MOTOR(int pwm, int dir, bool invert)
     this->encoderSpeed = 0;
     this->lastEncoderCount = 0;
     this->lastTime = 0;
+    this->targetSpeed = 0;
+    this->currentPower = 0;
 }
 
 MOTOR::MOTOR(int pwm, int dir)
@@ -36,6 +40,8 @@ MOTOR::MOTOR(int pwm, int dir)
     this->encoderSpeed = 0;
     this->lastEncoderCount = 0;
     this->lastTime = 0;
+    this->targetSpeed = 0;
+    this->currentPower = 0;
 }
 
 void MOTOR::begin()
@@ -53,13 +59,11 @@ void MOTOR::begin()
 
 void MOTOR::setPower(int _targetPower)
 {
-    // targetSpeed = 0; // we want to set the power, ensure target speed is nothing.
-    // invert direction if set
-    _targetPower *= invertMultiplier;
-    bool direction = _targetPower > 0;
-    // waste of cpu cycles, but I'd rather it predictably rollover
-    uint8_t pwmPower = map(abs(_targetPower), 0, MAX_SPEED, 0, 255);
-    if (abs(_targetPower) > 255)
+    int power = constrain(_targetPower, -MAX_SPEED, MAX_SPEED);
+    power *= invertMultiplier;
+    bool direction = power > 0;
+    uint8_t pwmPower = map(abs(power), 0, MAX_SPEED, 0, 255);
+    if (abs(_targetPower) > MAX_SPEED)
     {
         Serial.println("Motor power rollover. Did you mean to do that?");
     }
@@ -70,22 +74,8 @@ void MOTOR::setPower(int _targetPower)
 
 void MOTOR::setSpeed(int _targetSpeed)
 {
-    // say speed, motor go it!
-    // repeatedly call this
-
-    // coast if 0
-    // if (_targetSpeed == 0)
-    // {
-    //     setPower(0);
-    //     return;
-    // }
-
-    // apply inversion
-    _targetSpeed *= invertMultiplier;
-
-    // estimate initial speed
-    // if (_targetSpeed != targetSpeed)
-    //     currentPower = MAX_ENC_SPEED / MAX_SPEED * targetSpeed;
+    // Set the logical target speed.
+    // Feedback (encoderSpeed) is already inversion-corrected.
 
     // set target speed
     targetSpeed = _targetSpeed;
@@ -95,15 +85,15 @@ void MOTOR::setSpeed(int _targetSpeed)
 void MOTOR::adjustSpeed()
 {
 
-    Serial.print("Encoder Speed: ");
-    Serial.print(getEncoderSpeed());
-    Serial.print("\tEncoder Count: ");
-    Serial.print(getEncoderCount());
-    Serial.print("\tCurrent Power: ");
-    Serial.print(currentPower);
-    Serial.print("\tTarget Speed: ");
-    Serial.print(targetSpeed);
-    Serial.println();
+    // Serial.print("Encoder Speed: ");
+    // Serial.print(getEncoderSpeed());
+    // Serial.print("\tEncoder Count: ");
+    // Serial.print(getEncoderCount());
+    // Serial.print("\tCurrent Power: ");
+    // Serial.print(currentPower);
+    // Serial.print("\tTarget Speed: ");
+    // Serial.print(targetSpeed);
+    // Serial.println();
 
     if (getEncoderSpeed() < targetSpeed)
     { // if motor speed not enough, increase power to it by a little bit
@@ -159,13 +149,12 @@ void MOTOR::calculateEncoderSpeed()
     if (delta < minEncCalcDelta)                  // Only calculate if at least MIN_ENC_CALC_DELTA ms have passed for better resolution
         return;
 
-    // Calculate encoder displacement since last function call.
+    // Calculate logical encoder displacement and speed
     long currentEncoderCount = getEncoderCount();
-    long encoderDisplacement = abs(currentEncoderCount - lastEncoderCount); // change in encoder count since last function call
+    // speed = (change in counts * 1000ms) / change in time
+    encoderSpeed = ((currentEncoderCount - lastEncoderCount) * 1000L) / (long)delta;
 
-    // Calculate the speed of the motor (S = d/t) in pulses per second
-    encoderSpeed = (encoderDisplacement * 1000L) / delta;
-
+    // If target is 0, stop immediately and reset the adjustment power
     if (targetSpeed != 0)
         adjustSpeed();
     else
@@ -180,5 +169,9 @@ void MOTOR::calculateEncoderSpeed()
 
 long MOTOR::getEncoderSpeed()
 {
-    return encoderSpeed;
+    noInterrupts(); // atomic guards
+    long speed = encoderSpeed;
+    interrupts();
+
+    return speed;
 }
