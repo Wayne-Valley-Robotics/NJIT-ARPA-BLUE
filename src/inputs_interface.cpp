@@ -1,7 +1,7 @@
 #include "inputs_interface.h"
 #include "SerialTransfer.h"
 
-#define DEADZONE 25
+#define DEADZONE 12
 
 namespace PS4
 {
