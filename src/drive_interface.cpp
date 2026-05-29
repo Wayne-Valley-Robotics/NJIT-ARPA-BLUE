@@ -53,20 +53,16 @@ namespace drive_interface
         m2Val = constrain(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED);
         m3Val = constrain(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED);
 
-        // m1Val = map(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        // m2Val = map(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
-        // m3Val = map(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m1Val = map(m1Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m2Val = map(m2Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
+        m3Val = map(m3Val, -MOTOR::MAX_SPEED, MOTOR::MAX_SPEED, -MOTOR::MAX_ENC_SPEED, MOTOR::MAX_ENC_SPEED);
 
-        // m1.setSpeed(m3Val);
-        // m2.setSpeed(m2Val);
-        // m3.setSpeed(m1Val);
-        m1.setPower(m3Val);
-        m2.setPower(m2Val);
-        m3.setPower(m1Val);
-        // m1.setPower(100);
+        m1.setSpeed(m3Val);
+        m2.setSpeed(m2Val);
+        m3.setSpeed(m1Val);
 
-        // m1.calculateEncoderSpeed();
-        // m2.calculateEncoderSpeed();
-        // m3.calculateEncoderSpeed();
+        m1.calculateEncoderSpeed();
+        m2.calculateEncoderSpeed();
+        m3.calculateEncoderSpeed();
     }
 }
